@@ -22,10 +22,10 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
-        android:layout_width="350dp"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="120dp"
-        app:cardCornerRadius="5dp"
+        app:cardCornerRadius="10dp"
         app:cardElevation="20dp"
         app:layout_constraintBottom_toTopOf="@+id/imageView"
         app:layout_constraintEnd_toEndOf="parent"
@@ -94,7 +94,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="10dp"
                 android:layout_marginBottom="10dp"
-                android:hint="password"
+                android:hint="Password"
                 app:passwordToggleEnabled="true"
                 app:passwordToggleTint="#70ccdf">
 
@@ -198,23 +198,24 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:id="@+id/signIntransferClick"
+                >
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/poppinsmedium"
-                android:text="Already have an account?"
-                android:textSize="15sp"/>
+                android:text="Already have an account? Sign in"
+                android:textSize="15sp"
+                android:textColor="@color/purple_700"
+               />
 
-            <TextView
-                android:id="@+id/signinTxt"
-                android:layout_width="wrap_content"
 
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/poppinsmedium"
-                android:text=" Sign in"
-                android:textSize="15sp"/>
-                android:textColor="#3F51B5" />
+            </LinearLayout>
 
         </LinearLayout>
 

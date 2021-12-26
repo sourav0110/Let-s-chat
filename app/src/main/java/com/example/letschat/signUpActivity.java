@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -35,13 +36,14 @@ public class signUpActivity extends AppCompatActivity {
         progressDialog=new ProgressDialog(signUpActivity.this);
         progressDialog.setTitle("Creating account");
         progressDialog.setMessage("We are creating your account");
+        String userEmail = binding.UserSignUpEmailET.getText().toString();
+        String userPassword=binding.userPasswordSignUpET.getText().toString();
         binding.SignupBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(binding.UsernameSignUpET.getText().toString()!=""){
-                    Toast.makeText(signUpActivity.this,"Username cannot be empty",Toast.LENGTH_LONG).show();
-                }
-                else {
+                if (userEmail.equals("") || userPassword.equals("")) {
+                    Toast.makeText(signUpActivity.this, "The required field cannot be empty", Toast.LENGTH_LONG).show();
+                } else {
                     progressDialog.show();
                     auth.createUserWithEmailAndPassword(binding.UserSignUpEmailET.getText().toString(), binding.userPasswordSignUpET.getText().toString())
                             .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -61,7 +63,20 @@ public class signUpActivity extends AppCompatActivity {
                 }
             }
         });
+        binding.signIntransferClick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(signUpActivity.this,MainActivity.class);
+                startActivity(intent);
+            }
+        });
 
 
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        finishAffinity();
     }
 }
