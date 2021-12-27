@@ -2,20 +2,32 @@ package com.example.letschat;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.example.letschat.Adapters.UsersAdapter;
+import com.example.letschat.MODELS.User;
 import com.example.letschat.databinding.ActivityChatAppMainBinding;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 public class chatAppMainActivity extends AppCompatActivity {
     ActivityChatAppMainBinding binding;
     FirebaseAuth mAuth;
+    ArrayList<User> list=new ArrayList<>();
+    FirebaseDatabase database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +36,30 @@ public class chatAppMainActivity extends AppCompatActivity {
         mAuth=FirebaseAuth.getInstance();
         binding=ActivityChatAppMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        database=FirebaseDatabase.getInstance();
+        UsersAdapter adapter=new UsersAdapter(list,getApplicationContext());
+        binding.chatRecyclerView.setAdapter(adapter);
+        LinearLayoutManager layoutManager=new LinearLayoutManager(getApplicationContext());
+        binding.chatRecyclerView.setLayoutManager(layoutManager);
+
+        database.getReference().child("Users").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                list.clear();
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                    User users=dataSnapshot.getValue(User.class);
+                    users.getUserId(dataSnapshot.getKey());
+                    list.add(users);
+
+                }
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
     }
 
