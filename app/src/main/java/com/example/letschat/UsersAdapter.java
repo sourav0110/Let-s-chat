@@ -1,6 +1,7 @@
-package com.example.letschat.Adapters;
+package com.example.letschat;
 
 import android.content.Context;
+
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.letschat.MODELS.User;
-import com.example.letschat.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -33,6 +33,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.viewHolder>{
     public viewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view= LayoutInflater.from(context).inflate(R.layout.sample_show_user,parent,false);
         return new viewHolder(view);
+
     }
 
     @Override
@@ -43,6 +44,11 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.viewHolder>{
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent intent=new Intent(view.getContext(),chatDetailActivity.class);
+                intent.putExtra("userId",users.getUserId());
+                intent.putExtra("userName",users.getUserName());
+                intent.putExtra("userProfilePic",users.getProfilepic());
+                view.getContext().startActivity(intent);
 
             }
         });

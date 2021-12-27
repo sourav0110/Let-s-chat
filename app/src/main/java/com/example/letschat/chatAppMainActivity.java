@@ -11,10 +11,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.example.letschat.Adapters.UsersAdapter;
 import com.example.letschat.MODELS.User;
 import com.example.letschat.databinding.ActivityChatAppMainBinding;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,7 +40,7 @@ public class chatAppMainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         database=FirebaseDatabase.getInstance();
         contactDatabase=FirebaseDatabase.getInstance();
-        UsersAdapter adapter=new UsersAdapter(list,getApplicationContext());
+        UsersAdapter adapter=new UsersAdapter(list,chatAppMainActivity.this);
         binding.chatRecyclerView.setAdapter(adapter);
         LinearLayoutManager layoutManager=new LinearLayoutManager(getApplicationContext());
         binding.chatRecyclerView.setLayoutManager(layoutManager);
@@ -98,7 +96,7 @@ public class chatAppMainActivity extends AppCompatActivity {
                 list.clear();
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                     User users=dataSnapshot.getValue(User.class);
-                    users.getUserId(dataSnapshot.getKey());
+                    users.setUserId(dataSnapshot.getKey());
                     //Log.d("Sourav",users.getMail());
 
                     list.add(users);
@@ -140,9 +138,5 @@ public class chatAppMainActivity extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        finishAffinity();
-    }
+
 }
