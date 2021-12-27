@@ -12,7 +12,7 @@
         android:layout_height="100dp"
         android:layout_marginLeft="5dp"
         android:padding="5dp"
-        android:src="@drawable/user"
+        android:src="@drawable/ugr"
         app:civ_border_color="#FF000000"
         app:civ_border_width="2dp" />
 
@@ -29,6 +29,7 @@
             android:paddingTop="5dp"
             android:paddingBottom="5dp"
             android:text="Sourav"
+            android:layout_marginStart="10dp"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -38,6 +39,7 @@
             android:layout_height="wrap_content"
             android:paddingTop="2dp"
             android:paddingBottom="2dp"
+            android:layout_marginStart="10dp"
             android:text="last message" />
     </LinearLayout>
 

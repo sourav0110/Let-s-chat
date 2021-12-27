@@ -1,6 +1,7 @@
 package com.example.letschat.Adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,8 +38,14 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.viewHolder>{
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
         User users=list.get(position);
-        Picasso.get().load(users.getProfilepic()).placeholder(R.drawable.user).into(holder.image);
+        Picasso.get().load(users.getProfilepic()).placeholder(R.drawable.ugr).into(holder.image);
         holder.username.setText(users.getUserName());
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
     }
 
     @Override
