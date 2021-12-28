@@ -12,16 +12,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LetsChat">
         <activity
+            android:name=".chatRoomActivity"
+            android:exported="false" />
+        <activity
             android:name=".chatDetailActivity"
-            android:exported="false" >
-
-        </activity>
+            android:exported="false"></activity>
         <activity
             android:name=".chatAppMainActivity"
             android:exported="false" />
         <activity
             android:name=".signUpActivity"
-            android:exported="false"></activity>
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -30,7 +31,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
     </application>
 

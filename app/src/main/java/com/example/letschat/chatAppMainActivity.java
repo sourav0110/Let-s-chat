@@ -131,6 +131,10 @@ public class chatAppMainActivity extends AppCompatActivity {
                 Intent intent=new Intent(chatAppMainActivity.this,MainActivity.class);
                 startActivity(intent);
                 break;
+            case R.id.chatRoom:
+                Intent intentt=new Intent(chatAppMainActivity.this,chatRoomActivity.class);
+                startActivity(intentt);
+                break;
             default:
                 Toast.makeText(chatAppMainActivity.this,"Some error has occured",Toast.LENGTH_LONG).show();
 

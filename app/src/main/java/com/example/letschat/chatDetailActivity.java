@@ -54,6 +54,7 @@ public class chatDetailActivity extends AppCompatActivity {
         binding.chatDetailsRecyclerView.setAdapter(chatAdapter);
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(chatDetailActivity.this);
         binding.chatDetailsRecyclerView.setLayoutManager(linearLayoutManager);
+        binding.chatDetailsRecyclerView.smoothScrollToPosition(chatAdapter.getItemCount());
         final String senderRoom =senderId+receiveId;
         final String receiverRoom = receiveId+senderId;
         db1.getReference().child("Chats").child(senderRoom).addValueEventListener(new ValueEventListener() {
@@ -66,6 +67,8 @@ public class chatDetailActivity extends AppCompatActivity {
                     messagesModels.add(model);
 
                 }
+                chatAdapter.notifyDataSetChanged();
+                binding.chatDetailsRecyclerView.smoothScrollToPosition(chatAdapter.getItemCount());
             }
 
             @Override
