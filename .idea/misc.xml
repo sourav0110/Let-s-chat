@@ -3,6 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/ASUS/AndroidStudioProjects/Letschat/app/src/main/res/drawable/bg_receiver.xml" value="0.26614583333333336" />
+        <entry key="..\:/Users/ASUS/AndroidStudioProjects/Letschat/app/src/main/res/drawable/bg_sender.xml" value="0.26614583333333336" />
         <entry key="..\:/Users/ASUS/AndroidStudioProjects/Letschat/app/src/main/res/drawable/bgedittext.xml" value="0.26614583333333336" />
         <entry key="..\:/Users/ASUS/AndroidStudioProjects/Letschat/app/src/main/res/drawable/ic_baseline_email_24.xml" value="0.26614583333333336" />
         <entry key="..\:/Users/ASUS/AndroidStudioProjects/Letschat/app/src/main/res/drawable/ic_launcher_background.xml" value="0.26614583333333336" />
@@ -13,6 +15,8 @@
         <entry key="..\:/Users/ASUS/AndroidStudioProjects/Letschat/app/src/main/res/layout/activity_main.xml" value="0.2" />
         <entry key="..\:/Users/ASUS/AndroidStudioProjects/Letschat/app/src/main/res/layout/activity_sign_up.xml" value="0.176" />
         <entry key="..\:/Users/ASUS/AndroidStudioProjects/Letschat/app/src/main/res/layout/fragment_status.xml" value="0.1598731884057971" />
+        <entry key="..\:/Users/ASUS/AndroidStudioProjects/Letschat/app/src/main/res/layout/sample_receiver.xml" value="0.1" />
+        <entry key="..\:/Users/ASUS/AndroidStudioProjects/Letschat/app/src/main/res/layout/sample_sender.xml" value="0.264" />
         <entry key="..\:/Users/ASUS/AndroidStudioProjects/Letschat/app/src/main/res/layout/sample_show_user.xml" value="0.2" />
         <entry key="..\:/Users/ASUS/AndroidStudioProjects/Letschat/app/src/main/res/menu/menu.xml" value="0.264" />
       </map>

@@ -138,5 +138,9 @@ public class chatAppMainActivity extends AppCompatActivity {
         return true;
     }
 
-
+   /* @Override
+    protected void onStop() {
+        super.onStop();
+        finish();
+    }*/
 }

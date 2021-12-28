@@ -36,11 +36,12 @@ public class signUpActivity extends AppCompatActivity {
         progressDialog=new ProgressDialog(signUpActivity.this);
         progressDialog.setTitle("Creating account");
         progressDialog.setMessage("We are creating your account");
-        String userEmail = binding.UserSignUpEmailET.getText().toString();
-        String userPassword=binding.userPasswordSignUpET.getText().toString();
+
         binding.SignupBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String userEmail = binding.UserSignUpEmailET.getText().toString();
+                String userPassword=binding.userPasswordSignUpET.getText().toString();
                 if (userEmail.equals("") || userPassword.equals("")) {
                     Toast.makeText(signUpActivity.this, "The required field cannot be empty", Toast.LENGTH_LONG).show();
                 } else {
@@ -55,6 +56,8 @@ public class signUpActivity extends AppCompatActivity {
                                         String id = task.getResult().getUser().getUid();
                                         database.getReference().child("Users").child(id).setValue(user);
                                         Toast.makeText(signUpActivity.this, "User created successfully", Toast.LENGTH_LONG).show();
+                                        Intent intent=new Intent(signUpActivity.this,chatAppMainActivity.class);
+                                        startActivity(intent);
                                     } else {
                                         Toast.makeText(signUpActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
                                     }
@@ -70,6 +73,7 @@ public class signUpActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
 
 
     }

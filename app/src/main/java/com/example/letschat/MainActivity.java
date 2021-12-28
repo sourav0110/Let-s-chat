@@ -96,27 +96,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent=new Intent(MainActivity.this,chatAppMainActivity.class);
             startActivity(intent);
         }
-        /*ActivityResultLauncher<Intent> someActivityResultLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                new ActivityResultCallback<ActivityResult>() {
-                    @Override
-                    public void onActivityResult(ActivityResult result) {
 
-                        if (result.getResultCode() == RESULT_OK) {
-                                Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
-                                try {
-                                    // Google Sign In was successful, authenticate with Firebase
-                                    GoogleSignInAccount account = task.getResult(ApiException.class);
-                                    Log.d("TAG", "firebaseAuthWithGoogle:" + account.getId());
-                                    firebaseAuthWithGoogle(account.getIdToken());
-                                } catch (ApiException e) {
-                                    // Google Sign In failed, update UI appropriately
-                                    Log.w("TAG", "Google sign in failed", e);
-                                }
-                            }
-                        }
-                    }
-        );*/
         binding.googleLoginIV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
