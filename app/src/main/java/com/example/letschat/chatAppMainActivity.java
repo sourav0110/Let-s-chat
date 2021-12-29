@@ -23,6 +23,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class chatAppMainActivity extends AppCompatActivity {
     ActivityChatAppMainBinding binding;
@@ -30,6 +31,8 @@ public class chatAppMainActivity extends AppCompatActivity {
     ArrayList<User> list=new ArrayList<>();
     FirebaseDatabase database,contactDatabase;
     ArrayList<String> userContacts = new ArrayList<>();
+
+    UsersAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,40 +43,30 @@ public class chatAppMainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         database=FirebaseDatabase.getInstance();
         contactDatabase=FirebaseDatabase.getInstance();
-        UsersAdapter adapter=new UsersAdapter(list,chatAppMainActivity.this);
+        adapter=new UsersAdapter(list,chatAppMainActivity.this);
         binding.chatRecyclerView.setAdapter(adapter);
         LinearLayoutManager layoutManager=new LinearLayoutManager(getApplicationContext());
         binding.chatRecyclerView.setLayoutManager(layoutManager);
         Log.d("Sourav01",mAuth.getCurrentUser().getUid().toString());
-        userContacts.clear();
+
+
         try {
-            contactDatabase.getReference().child("userContacts").child(mAuth.getCurrentUser().getUid().toString()).addChildEventListener(new ChildEventListener() {
+            contactDatabase.getReference().child("userContacts").child(mAuth.getCurrentUser().getUid().toString()).addValueEventListener(new ValueEventListener() {
                 @Override
-                public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                    String data = snapshot.getValue().toString();
-                    if(userContacts.contains(data)==false) {
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    userContacts.clear();
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        String data = Objects.requireNonNull(dataSnapshot.getValue()).toString();
+                        if(userContacts.contains(data)==false) {
 
-                        userContacts.add(data);
-                        Log.d("Sourav01", String.valueOf(userContacts.contains(data)));
+                            userContacts.add(data);
+                            Log.d("Sourav01", String.valueOf(userContacts.contains(data)));
 
+                        }
+                        else
+                            Log.d("Sourav01","Not added");
+                        UserListUpdate();
                     }
-                    else
-                        Log.d("Sourav01","Not added");
-
-                }
-                @Override
-                public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-                }
-
-                @Override
-                public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-                }
-
-                @Override
-                public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
                 }
 
                 @Override
@@ -85,31 +78,10 @@ public class chatAppMainActivity extends AppCompatActivity {
 
 
 
-
         }catch (Exception e){
             Toast.makeText(chatAppMainActivity.this,e.getMessage(),Toast.LENGTH_LONG).show();
         }
 
-        database.getReference().child("Users").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                list.clear();
-                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                    User users=dataSnapshot.getValue(User.class);
-                    users.setUserId(dataSnapshot.getKey());
-                    //Log.d("Sourav",users.getMail());
-
-                    list.add(users);
-
-                }
-                adapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
 
     }
 
@@ -141,10 +113,39 @@ public class chatAppMainActivity extends AppCompatActivity {
         }
         return true;
     }
+    public void UserListUpdate(){
+        database.getReference().child("Users").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                list.clear();
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                    User users=dataSnapshot.getValue(User.class);
+                    users.setUserId(dataSnapshot.getKey());
+                    //Log.d("Sourav",users.getMail());
+                    String mail=users.getMail();
+                    Log.d("SouravTag",mail);
+                    Log.d("SouravTag",String.valueOf(userContacts.contains(mail)));
+                    if(userContacts.contains(mail)){
+                        list.add(users);
+                    }
 
-   /* @Override
-    protected void onStop() {
-        super.onStop();
-        finish();
-    }*/
+
+
+                }
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finishAffinity();
+    }
 }

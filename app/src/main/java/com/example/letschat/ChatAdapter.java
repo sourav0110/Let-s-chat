@@ -73,6 +73,7 @@ public class ChatAdapter extends RecyclerView.Adapter{
                 .withReactions(reactions)
                 .build();
 
+
         ReactionPopup popup = new ReactionPopup(context, config, (pos) -> {
             if(holder.getClass()==SenderViewHolder.class){
                 ((SenderViewHolder)holder).Senderfeelings.setImageResource(reactions[pos]);

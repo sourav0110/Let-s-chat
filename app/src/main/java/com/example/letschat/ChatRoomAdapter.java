@@ -21,6 +21,8 @@ public class ChatRoomAdapter extends RecyclerView.Adapter{
     int SENDER_VIEW_TYPE =1;
     int RECEIVER_VIEW_TYPE=2;
 
+
+
     public ChatRoomAdapter(ArrayList<ChatRoomMessageModel> messagesModels, Context context) {
         this.messagesModels = messagesModels;
         this.context = context;
@@ -53,6 +55,7 @@ public class ChatRoomAdapter extends RecyclerView.Adapter{
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         ChatRoomMessageModel messagesModel=messagesModels.get(position);
+
         if(holder.getClass()==SenderChatRoomViewHolder.class){
             ((SenderChatRoomViewHolder)holder).senderMsg.setText(messagesModel.getMessage());
         }else {
