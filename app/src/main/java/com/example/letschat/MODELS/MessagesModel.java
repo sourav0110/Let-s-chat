@@ -3,6 +3,24 @@ package com.example.letschat.MODELS;
 public class MessagesModel {
     String uId,message;
     long timestamp;
+    private int feelings=-1;
+    private String messageId;
+
+    public String getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
+    }
+
+    public int getFeelings() {
+        return feelings;
+    }
+
+    public void setFeelings(int feelings) {
+        this.feelings = feelings;
+    }
 
     public MessagesModel(String uId, String message, long timestamp) {
         this.uId = uId;

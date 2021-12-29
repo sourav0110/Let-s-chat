@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:id="@+id/senderMessage">
 
     <androidx.constraintlayout.widget.ConstraintLayout
 
@@ -26,6 +27,20 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             app:layout_constraintGuide_end="16dp" />
+
+        <ImageView
+            android:id="@+id/feelingsSenderChatDetails"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/senderText"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.01999998"
+            app:srcCompat="@drawable/ic_fb_love" />
 
         <TextView
             android:id="@+id/senderText"

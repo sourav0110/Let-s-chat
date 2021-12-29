@@ -35,12 +35,15 @@ public class chatDetailActivity extends AppCompatActivity {
         database=FirebaseDatabase.getInstance();
         mAuth=FirebaseAuth.getInstance();
         db1=FirebaseDatabase.getInstance();
+
         final String senderId=mAuth.getCurrentUser().getUid();
         String receiveId=getIntent().getStringExtra("userId");
         String userName=getIntent().getStringExtra("userName");
         String profilePic=getIntent().getStringExtra("userProfilePic");
         binding.usernameChatDetails.setText(userName);
         Picasso.get().load(profilePic).placeholder(R.drawable.user).into(binding.profileImageChatDetails);
+        final String senderRoom =senderId+receiveId;
+        final String receiverRoom = receiveId+senderId;
         binding.backArrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -50,13 +53,12 @@ public class chatDetailActivity extends AppCompatActivity {
             }
         });
         final ArrayList<MessagesModel> messagesModels=new ArrayList<>();
-        final ChatAdapter chatAdapter=new ChatAdapter(messagesModels,chatDetailActivity.this);
+        final ChatAdapter chatAdapter=new ChatAdapter(messagesModels,chatDetailActivity.this,senderRoom,receiverRoom);
         binding.chatDetailsRecyclerView.setAdapter(chatAdapter);
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(chatDetailActivity.this);
         binding.chatDetailsRecyclerView.setLayoutManager(linearLayoutManager);
         binding.chatDetailsRecyclerView.smoothScrollToPosition(chatAdapter.getItemCount());
-        final String senderRoom =senderId+receiveId;
-        final String receiverRoom = receiveId+senderId;
+
         db1.getReference().child("Chats").child(senderRoom).addValueEventListener(new ValueEventListener() {
 
             @Override
@@ -64,6 +66,7 @@ public class chatDetailActivity extends AppCompatActivity {
                 messagesModels.clear();
                 for(DataSnapshot snapshot1 : snapshot.getChildren()){
                     MessagesModel model=snapshot1.getValue(MessagesModel.class);
+                    model.setMessageId(snapshot1.getKey());
                     messagesModels.add(model);
 
                 }
@@ -80,16 +83,19 @@ public class chatDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String message = binding.editTextChatDetail.getText().toString();
+                // newly added for emogi
+                String randomKey=database.getReference().push().getKey();
                 if (!message.equals("")) {
                     final MessagesModel model = new MessagesModel(senderId, message);
                     model.setTimestamp(new Date().getTime());
+                    model.setMessageId(randomKey);
                     binding.editTextChatDetail.setText("");
                     database.getReference().child("Chats")
                             .child(senderRoom)
-                            .push().setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            .child(randomKey).setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            database.getReference().child("Chats").child(receiverRoom).push().setValue(model).addOnSuccessListener(
+                            database.getReference().child("Chats").child(receiverRoom).child(randomKey).setValue(model).addOnSuccessListener(
                                     new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void unused) {
