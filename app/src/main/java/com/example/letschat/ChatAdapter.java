@@ -1,12 +1,15 @@
 package com.example.letschat;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -66,6 +69,7 @@ public class ChatAdapter extends RecyclerView.Adapter{
             R.drawable.ic_fb_angry
     };
 
+
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         MessagesModel messagesModel=messagesModels.get(position);
@@ -73,64 +77,89 @@ public class ChatAdapter extends RecyclerView.Adapter{
                 .withReactions(reactions)
                 .build();
 
+            ReactionPopup popup = new ReactionPopup(context, config, (pos) -> {
+                if(holder.getClass()==SenderViewHolder.class){
+                    ((SenderViewHolder)holder).Senderfeelings.setImageResource(reactions[pos]);
+                    ((SenderViewHolder)holder).Senderfeelings.setVisibility(View.VISIBLE);
 
-        ReactionPopup popup = new ReactionPopup(context, config, (pos) -> {
-            if(holder.getClass()==SenderViewHolder.class){
-                ((SenderViewHolder)holder).Senderfeelings.setImageResource(reactions[pos]);
-                ((SenderViewHolder)holder).Senderfeelings.setVisibility(View.VISIBLE);
+                }
+                else{
+                    ((ReceiverViewHolder)holder).Receiverfeelings.setImageResource(reactions[pos]);
+                    ((ReceiverViewHolder)holder).Receiverfeelings.setVisibility(View.VISIBLE);
+                }
+                messagesModel.setFeelings(pos);
+                FirebaseDatabase.getInstance().getReference()
+                        .child("Chats")
+                        .child(senderRoom)
+                        .child(messagesModel.getMessageId()).setValue(messagesModel);
+                FirebaseDatabase.getInstance().getReference()
+                        .child("Chats")
+                        .child(receiverRoom)
+                        .child(messagesModel.getMessageId()).setValue(messagesModel);
+                return true; // true is closing popup, false is requesting a new selection
 
-            }
-            else{
-                ((ReceiverViewHolder)holder).Receiverfeelings.setImageResource(reactions[pos]);
-                ((ReceiverViewHolder)holder).Receiverfeelings.setVisibility(View.VISIBLE);
-            }
-            messagesModel.setFeelings(pos);
-            FirebaseDatabase.getInstance().getReference()
-                    .child("Chats")
-                    .child(senderRoom)
-                    .child(messagesModel.getMessageId()).setValue(messagesModel);
-            FirebaseDatabase.getInstance().getReference()
-                    .child("Chats")
-                    .child(receiverRoom)
-                    .child(messagesModel.getMessageId()).setValue(messagesModel);
-            return true; // true is closing popup, false is requesting a new selection
+            });
 
-        });
+
         if(holder.getClass()==SenderViewHolder.class){
             ((SenderViewHolder)holder).senderMsg.setText(messagesModel.getMessage());
 
             if(messagesModel.getFeelings()>=0) {
-                //messagesModel.setFeelings(reactions[messagesModel.getFeelings()]);
-                ((SenderViewHolder)holder).Senderfeelings.setImageResource(reactions[messagesModel.getFeelings()]);
-                ((SenderViewHolder)holder).Senderfeelings.setVisibility(View.VISIBLE);
+                try {
+                    //messagesModel.setFeelings(reactions[messagesModel.getFeelings()]);
+                    ((SenderViewHolder) holder).Senderfeelings.setImageResource(reactions[messagesModel.getFeelings()]);
+                    ((SenderViewHolder) holder).Senderfeelings.setVisibility(View.VISIBLE);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
             else{
                 ((SenderViewHolder)holder).Senderfeelings.setVisibility(View.GONE);
             }
-            ((SenderViewHolder)holder).senderMsg.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View view, MotionEvent motionEvent) {
-                    popup.onTouch(view,motionEvent);
-                    return false;
-                }
-            });
+            try {
+                ((SenderViewHolder) holder).senderMsg.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View view, MotionEvent motionEvent) {
+                        Log.d("SouravMotionEvent", String.valueOf(motionEvent.getActionMasked()));
+                        if(motionEvent.getAction() == MotionEvent.ACTION_DOWN)
+                            popup.onTouch(view, motionEvent);
+                            return false;
+
+                    }
+                });
+            }catch (Exception e)
+            {
+                e.printStackTrace();
+            }
 
         }else {
-            ((ReceiverViewHolder)holder).receiverMsg.setText(messagesModel.getMessage());
-            if(messagesModel.getFeelings()>=0) {
-                ((ReceiverViewHolder)holder).Receiverfeelings.setImageResource(reactions[messagesModel.getFeelings()]);
-                ((ReceiverViewHolder)holder).Receiverfeelings.setVisibility(View.VISIBLE);
-            }
-            else{
-                ((ReceiverViewHolder)holder).Receiverfeelings.setVisibility(View.GONE);
-            }
-            ((ReceiverViewHolder)holder).receiverMsg.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View view, MotionEvent motionEvent) {
-                    popup.onTouch(view,motionEvent);
-                    return false;
+            ((ReceiverViewHolder) holder).receiverMsg.setText(messagesModel.getMessage());
+            if (messagesModel.getFeelings() >= 0) {
+                try {
+                    ((ReceiverViewHolder) holder).Receiverfeelings.setImageResource(reactions[messagesModel.getFeelings()]);
+                    ((ReceiverViewHolder) holder).Receiverfeelings.setVisibility(View.VISIBLE);
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
-            });
+
+            } else {
+                ((ReceiverViewHolder) holder).Receiverfeelings.setVisibility(View.GONE);
+            }
+            try {
+                ((ReceiverViewHolder) holder).receiverMsg.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                        if(motionEvent.getActionMasked() == 0 || motionEvent.getActionMasked() ==1 )
+                            popup.onTouch(view, motionEvent);
+                            return false;
+                        }
+
+
+                });
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
 
     }

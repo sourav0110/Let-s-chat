@@ -95,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
         if(mAuth.getCurrentUser()!=null){
             Intent intent=new Intent(MainActivity.this,chatAppMainActivity.class);
             startActivity(intent);
+            finish();
         }
 
         binding.googleLoginIV.setOnClickListener(new View.OnClickListener() {

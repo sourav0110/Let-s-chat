@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.letschat.MODELS.MessagesModel;
 import com.example.letschat.databinding.ActivityChatDetailBinding;
@@ -21,6 +22,7 @@ import com.squareup.picasso.Picasso;
 import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 
 public class chatDetailActivity extends AppCompatActivity {
     ActivityChatDetailBinding binding;
@@ -79,35 +81,40 @@ public class chatDetailActivity extends AppCompatActivity {
 
             }
         });
-        binding.sendButtonChatDetails.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String message = binding.editTextChatDetail.getText().toString();
-                // newly added for emogi
-                String randomKey=database.getReference().push().getKey();
-                if (!message.equals("")) {
-                    final MessagesModel model = new MessagesModel(senderId, message);
-                    model.setTimestamp(new Date().getTime());
-                    model.setMessageId(randomKey);
-                    binding.editTextChatDetail.setText("");
-                    database.getReference().child("Chats")
-                            .child(senderRoom)
-                            .child(randomKey).setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void unused) {
-                            database.getReference().child("Chats").child(receiverRoom).child(randomKey).setValue(model).addOnSuccessListener(
-                                    new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void unused) {
+        try {
+            binding.sendButtonChatDetails.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String message = binding.editTextChatDetail.getText().toString();
+                    // newly added for emogi
+                    String randomKey = database.getReference().push().getKey();
+                    if (!message.equals("")) {
+                        final MessagesModel model = new MessagesModel(senderId, message);
+                        model.setTimestamp(new Date().getTime());
+                        model.setMessageId(randomKey);
+                        binding.editTextChatDetail.setText("");
+                        database.getReference().child("Chats")
+                                .child(senderRoom)
+                                .child(randomKey).setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                database.getReference().child("Chats").child(receiverRoom).child(randomKey).setValue(model).addOnSuccessListener(
+                                        new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void unused) {
 
+                                            }
                                         }
-                                    }
-                            );
-                        }
-                    });
+                                );
+                            }
+                        });
+                    }
                 }
-            }
-        });
+            });
+        }
+        catch (Exception e){
+            Toast.makeText(chatDetailActivity.this, Objects.requireNonNull(e.getMessage()).toString(),Toast.LENGTH_LONG).show();
+        }
 
 
 
