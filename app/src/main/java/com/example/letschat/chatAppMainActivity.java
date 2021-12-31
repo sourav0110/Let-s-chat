@@ -1,7 +1,6 @@
 package com.example.letschat;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -15,21 +14,22 @@ import android.widget.Toast;
 
 import com.example.letschat.MODELS.User;
 import com.example.letschat.databinding.ActivityChatAppMainBinding;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class chatAppMainActivity extends AppCompatActivity {
+public class chatAppMainActivity extends AppCompatActivity implements AddContactDialog.AddContactDialogListener {
     ActivityChatAppMainBinding binding;
     FirebaseAuth mAuth;
-    ArrayList<User> list=new ArrayList<>();
-    FirebaseDatabase database,contactDatabase;
+    ArrayList<User> list = new ArrayList<>();
+    FirebaseDatabase database, contactDatabase;
     ArrayList<String> userContacts = new ArrayList<>();
 
     UsersAdapter adapter;
@@ -38,16 +38,16 @@ public class chatAppMainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mAuth=FirebaseAuth.getInstance();
-        binding=ActivityChatAppMainBinding.inflate(getLayoutInflater());
+        mAuth = FirebaseAuth.getInstance();
+        binding = ActivityChatAppMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        database=FirebaseDatabase.getInstance();
-        contactDatabase=FirebaseDatabase.getInstance();
-        adapter=new UsersAdapter(list,chatAppMainActivity.this);
+        database = FirebaseDatabase.getInstance();
+        contactDatabase = FirebaseDatabase.getInstance();
+        adapter = new UsersAdapter(list, chatAppMainActivity.this);
         binding.chatRecyclerView.setAdapter(adapter);
-        LinearLayoutManager layoutManager=new LinearLayoutManager(getApplicationContext());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         binding.chatRecyclerView.setLayoutManager(layoutManager);
-        Log.d("Sourav01",mAuth.getCurrentUser().getUid().toString());
+        Log.d("Sourav01", Objects.requireNonNull(mAuth.getCurrentUser()).getEmail());
 
 
         try {
@@ -55,16 +55,16 @@ public class chatAppMainActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     userContacts.clear();
-                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         String data = Objects.requireNonNull(dataSnapshot.getValue()).toString();
-                        if(userContacts.contains(data)==false) {
+
+                        if (userContacts.contains(data) == false) {
 
                             userContacts.add(data);
                             Log.d("Sourav01", String.valueOf(userContacts.contains(data)));
 
-                        }
-                        else
-                            Log.d("Sourav01","Not added");
+                        } else
+                            Log.d("Sourav01", "Not added");
                         UserListUpdate();
                     }
                 }
@@ -76,10 +76,8 @@ public class chatAppMainActivity extends AppCompatActivity {
             });
 
 
-
-
-        }catch (Exception e){
-            Toast.makeText(chatAppMainActivity.this,e.getMessage(),Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Toast.makeText(chatAppMainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
         }
 
 
@@ -87,49 +85,48 @@ public class chatAppMainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater=getMenuInflater();
-        inflater.inflate(R.menu.menu,menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch(item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.Settings:
-                Toast.makeText(chatAppMainActivity.this,"Settings",Toast.LENGTH_LONG).show();
+                Toast.makeText(chatAppMainActivity.this, "Settings", Toast.LENGTH_LONG).show();
                 break;
             case R.id.Logout:
                 mAuth.signOut();
-                Intent intent=new Intent(chatAppMainActivity.this,MainActivity.class);
+                Intent intent = new Intent(chatAppMainActivity.this, MainActivity.class);
                 startActivity(intent);
                 break;
-            case R.id.chatRoom:
-                Intent intentt=new Intent(chatAppMainActivity.this,chatRoomActivity.class);
-                startActivity(intentt);
+            case R.id.addContact:
+                openDialog();
                 break;
             default:
-                Toast.makeText(chatAppMainActivity.this,"Some error has occured",Toast.LENGTH_LONG).show();
+                Toast.makeText(chatAppMainActivity.this, "Some error has occured", Toast.LENGTH_LONG).show();
 
         }
         return true;
     }
-    public void UserListUpdate(){
+
+    public void UserListUpdate() {
         database.getReference().child("Users").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 list.clear();
-                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                    User users=dataSnapshot.getValue(User.class);
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    User users = dataSnapshot.getValue(User.class);
                     users.setUserId(dataSnapshot.getKey());
-                    //Log.d("Sourav",users.getMail());
-                    String mail=users.getMail();
-                    Log.d("SouravTag",mail);
-                    Log.d("SouravTag",String.valueOf(userContacts.contains(mail)));
-                    if(userContacts.contains(mail)){
-                        list.add(users);
+                    String mail = users.getMail();
+                    Log.d("SouravTag", mail);
+                    Log.d("SouravTag", String.valueOf(userContacts.contains(mail)));
+                    if (!users.getUserId().equals(mAuth.getUid())) {
+                        if (userContacts.contains(mail)) {
+                            list.add(users);
+                        }
                     }
-
-
 
                 }
                 adapter.notifyDataSetChanged();
@@ -143,9 +140,76 @@ public class chatAppMainActivity extends AppCompatActivity {
 
     }
 
+    public void openDialog() {
+        AddContactDialog addContactDialog = new AddContactDialog();
+        addContactDialog.show(getSupportFragmentManager(), "AddCustomDialog");
+    }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         finishAffinity();
     }
+
+    @Override
+    public void addContact(String email) {
+        if(email.equals(mAuth.getCurrentUser().getEmail())){
+            Toast.makeText(chatAppMainActivity.this,"Not allowed to add own email",Toast.LENGTH_LONG).show();
+        }
+        checkUserDatabase(email);
+
+    }
+
+    public void checkUserDatabase(String email) {
+
+        Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("mail").equalTo(email);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String receiverContactUid="";
+
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        User users = dataSnapshot.getValue(User.class);
+                        users.setUserId(dataSnapshot.getKey());
+                        receiverContactUid=users.getUserId();
+                    }
+
+
+                   //Toast.makeText(chatAppMainActivity.this, receiverContactUid, Toast.LENGTH_LONG).show();
+
+
+                    if(!userContacts.contains(email)) {
+                        try {
+                            final String selfUserID = mAuth.getUid();
+                            if (selfUserID != null) {
+                                String finalReceiverContactUid = receiverContactUid;
+                                FirebaseDatabase.getInstance().getReference("userContacts").child(selfUserID).push().setValue(email).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                      if(finalReceiverContactUid !=null)
+                                        FirebaseDatabase.getInstance().getReference("userContacts").child(finalReceiverContactUid).push().setValue(mAuth.getCurrentUser().getEmail());
+                                    }
+                                });
+                            }
+                        } catch (Exception e) {
+                            Toast.makeText(chatAppMainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    }else{
+                        Toast.makeText(chatAppMainActivity.this, "Already present in contact", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(chatAppMainActivity.this, email + "is not " +
+                            "present", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+    }
+
 }
