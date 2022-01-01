@@ -5,11 +5,6 @@
         android:title="Chats"
         android:icon="@drawable/ic_chats"
         />
-    <item
-        android:id="@+id/statusBottomNavView"
-        android:title="Status"
-        android:icon="@drawable/ic_status"
-        />
 
 
 </menu>

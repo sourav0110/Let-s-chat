@@ -5,6 +5,15 @@ public class MessagesModel {
     long timestamp;
     private int feelings=-1;
     private String messageId;
+    private String imageUrl;
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 
     public String getMessageId() {
         return messageId;

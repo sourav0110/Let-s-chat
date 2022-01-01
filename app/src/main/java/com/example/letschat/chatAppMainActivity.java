@@ -23,6 +23,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 
 public class chatAppMainActivity extends AppCompatActivity implements AddContactDialog.AddContactDialogListener {
@@ -47,7 +48,7 @@ public class chatAppMainActivity extends AppCompatActivity implements AddContact
         binding.chatRecyclerView.setAdapter(adapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         binding.chatRecyclerView.setLayoutManager(layoutManager);
-        Log.d("Sourav01", Objects.requireNonNull(mAuth.getCurrentUser()).getEmail());
+       // Log.d("Sourav01", Objects.requireNonNull(mAuth.getCurrentUser()).getEmail());
 
 
         try {
@@ -56,16 +57,18 @@ public class chatAppMainActivity extends AppCompatActivity implements AddContact
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     userContacts.clear();
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        String data = Objects.requireNonNull(dataSnapshot.getValue()).toString();
+                        for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                            String data = Objects.requireNonNull(dataSnapshot1.getValue(String.class));
 
-                        if (userContacts.contains(data) == false) {
+                            if (userContacts.contains(data) == false) {
 
-                            userContacts.add(data);
-                            Log.d("Sourav01", String.valueOf(userContacts.contains(data)));
+                                userContacts.add(data);
+                                Log.d("Sourav01", String.valueOf(userContacts.contains(data)));
 
-                        } else
-                            Log.d("Sourav01", "Not added");
-                        UserListUpdate();
+                            } else
+                                Log.d("Sourav01", "Not added");
+                            UserListUpdate();
+                        }
                     }
                 }
 
@@ -155,12 +158,13 @@ public class chatAppMainActivity extends AppCompatActivity implements AddContact
     public void addContact(String email) {
         if(email.equals(mAuth.getCurrentUser().getEmail())){
             Toast.makeText(chatAppMainActivity.this,"Not allowed to add own email",Toast.LENGTH_LONG).show();
+        }else {
+           addContactDatabase(email);
         }
-        checkUserDatabase(email);
 
     }
 
-    public void checkUserDatabase(String email) {
+    public void addContactDatabase(String email) {
 
         Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("mail").equalTo(email);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -179,16 +183,22 @@ public class chatAppMainActivity extends AppCompatActivity implements AddContact
                    //Toast.makeText(chatAppMainActivity.this, receiverContactUid, Toast.LENGTH_LONG).show();
 
 
-                    if(!userContacts.contains(email)) {
+                    if(!userContacts.contains(email)) { //prevents duplication in own contact list
                         try {
                             final String selfUserID = mAuth.getUid();
                             if (selfUserID != null) {
-                                String finalReceiverContactUid = receiverContactUid;
-                                FirebaseDatabase.getInstance().getReference("userContacts").child(selfUserID).push().setValue(email).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                String finalReceiverContactUid = receiverContactUid; /*The Sender receiver uid mechanism avoid duplication in the receiver side contact */
+                                HashMap<String,String> mHashmap=new HashMap<>();
+                                mHashmap.put("contactID",email);
+                                FirebaseDatabase.getInstance().getReference("userContacts").child(selfUserID).child(receiverContactUid)
+                                        .setValue(mHashmap).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
-                                      if(finalReceiverContactUid !=null)
-                                        FirebaseDatabase.getInstance().getReference("userContacts").child(finalReceiverContactUid).push().setValue(mAuth.getCurrentUser().getEmail());
+                                        if (finalReceiverContactUid != null) {
+                                            HashMap<String, String> mHashmap1 = new HashMap<>();
+                                            mHashmap1.put("contactID",mAuth.getCurrentUser().getEmail() );
+                                            FirebaseDatabase.getInstance().getReference("userContacts").child(finalReceiverContactUid).child(selfUserID).setValue(mHashmap1);
+                                        }
                                     }
                                 });
                             }

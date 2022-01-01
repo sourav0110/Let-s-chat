@@ -1,26 +1,40 @@
 package com.example.letschat;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.letschat.MODELS.MessagesModel;
 import com.example.letschat.databinding.ActivityChatDetailBinding;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import java.sql.Array;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 
@@ -28,6 +42,11 @@ public class chatDetailActivity extends AppCompatActivity {
     ActivityChatDetailBinding binding;
     FirebaseDatabase database,db1;
     FirebaseAuth mAuth;
+    FirebaseStorage storage;
+    ProgressDialog dialog;
+    String senderRoom,receiverRoom;
+    String senderId,receiveId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,15 +56,19 @@ public class chatDetailActivity extends AppCompatActivity {
         database=FirebaseDatabase.getInstance();
         mAuth=FirebaseAuth.getInstance();
         db1=FirebaseDatabase.getInstance();
-
-        final String senderId=mAuth.getCurrentUser().getUid();
-        String receiveId=getIntent().getStringExtra("userId");
+        storage=FirebaseStorage.getInstance();
+        dialog=new ProgressDialog(chatDetailActivity.this);
+        dialog.setMessage("Uploading image");
+        dialog.setCancelable(false);
+        senderId=mAuth.getCurrentUser().getUid();
+        receiveId=getIntent().getStringExtra("userId");
         String userName=getIntent().getStringExtra("userName");
         String profilePic=getIntent().getStringExtra("userProfilePic");
         binding.usernameChatDetails.setText(userName);
-        Picasso.get().load(profilePic).placeholder(R.drawable.user).into(binding.profileImageChatDetails);
-        final String senderRoom =senderId+receiveId;
-        final String receiverRoom = receiveId+senderId;
+        Picasso.get().load(profilePic).placeholder(R.drawable.user).placeholder(R.drawable.ugr).into(binding.profileImageChatDetails);
+
+        senderRoom =senderId+receiveId;
+        receiverRoom = receiveId+senderId;
         binding.backArrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -79,6 +102,14 @@ public class chatDetailActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
+            }
+        });
+        binding.attachmentChatDetails.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                galleryPicker.launch(intent);
             }
         });
         try {
@@ -115,11 +146,65 @@ public class chatDetailActivity extends AppCompatActivity {
         catch (Exception e){
             Toast.makeText(chatDetailActivity.this, Objects.requireNonNull(e.getMessage()).toString(),Toast.LENGTH_LONG).show();
         }
-
-
-
-
     }
+    private ActivityResultLauncher<Intent> galleryPicker=registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>(){
+
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if(result.getResultCode()== Activity.RESULT_OK){
+                        Intent data=result.getData();
+                        Uri imageUri=data.getData();
+                        if(imageUri !=null){
+                            Calendar calendar=Calendar.getInstance();
+                            StorageReference reference=storage.getReference().child("chats").child(calendar.getTimeInMillis()+"");
+                            dialog.show();
+                            reference.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                                    if(task.isSuccessful()){
+                                        reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                            @Override
+                                            public void onSuccess(Uri uri) {
+                                                dialog.dismiss();
+                                              String filePath=uri.toString();
+                                              String randomKey = database.getReference().push().getKey();
+                                              final MessagesModel model = new MessagesModel(senderId, "photo");
+                                              model.setTimestamp(new Date().getTime());
+                                              model.setImageUrl(filePath);
+                                              model.setMessageId(randomKey);
+                                              binding.editTextChatDetail.setText("");
+                                              database.getReference().child("Chats")
+                                                       .child(senderRoom)
+                                                        .child(randomKey).setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void unused) {
+                                                        database.getReference().child("Chats").child(receiverRoom).child(randomKey).setValue(model).addOnSuccessListener(
+                                                                new OnSuccessListener<Void>() {
+                                                                    @Override
+                                                                    public void onSuccess(Void unused) {
+
+                                                                    }
+                                                                }
+                                                        );
+                                                    }
+                                                });
+
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+
+
+                    }else{
+                        Toast.makeText(chatDetailActivity.this,"Cancelled",Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+    );
 
 
 }

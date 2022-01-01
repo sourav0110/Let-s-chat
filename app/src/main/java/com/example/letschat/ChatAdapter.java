@@ -20,6 +20,7 @@ import com.github.pgreze.reactions.ReactionsConfig;
 import com.github.pgreze.reactions.ReactionsConfigBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -78,6 +79,8 @@ public class ChatAdapter extends RecyclerView.Adapter{
                 .build();
 
             ReactionPopup popup = new ReactionPopup(context, config, (pos) -> {
+                if(pos<0)
+                    return false;
                 if(holder.getClass()==SenderViewHolder.class){
                     ((SenderViewHolder)holder).Senderfeelings.setImageResource(reactions[pos]);
                     ((SenderViewHolder)holder).Senderfeelings.setVisibility(View.VISIBLE);
@@ -102,11 +105,16 @@ public class ChatAdapter extends RecyclerView.Adapter{
 
 
         if(holder.getClass()==SenderViewHolder.class){
+
+            if(messagesModel.getMessage().equals("photo")){
+                ((SenderViewHolder)holder).imageViewChat.setVisibility(View.VISIBLE);
+                ((SenderViewHolder)holder).senderMsg.setVisibility(View.INVISIBLE);
+                Picasso.get().load(messagesModel.getImageUrl()).placeholder(R.drawable.imageplaceholder).into(((SenderViewHolder)holder).imageViewChat);
+            }
             ((SenderViewHolder)holder).senderMsg.setText(messagesModel.getMessage());
 
             if(messagesModel.getFeelings()>=0) {
                 try {
-                    //messagesModel.setFeelings(reactions[messagesModel.getFeelings()]);
                     ((SenderViewHolder) holder).Senderfeelings.setImageResource(reactions[messagesModel.getFeelings()]);
                     ((SenderViewHolder) holder).Senderfeelings.setVisibility(View.VISIBLE);
                 }catch (Exception e){
@@ -134,6 +142,11 @@ public class ChatAdapter extends RecyclerView.Adapter{
 
         }else {
             ((ReceiverViewHolder) holder).receiverMsg.setText(messagesModel.getMessage());
+            if(messagesModel.getMessage().equals("photo")){
+                ((ReceiverViewHolder)holder).imageViewChat.setVisibility(View.VISIBLE);
+                ((ReceiverViewHolder)holder).receiverMsg.setVisibility(View.INVISIBLE);
+                Picasso.get().load(messagesModel.getImageUrl()).placeholder(R.drawable.imageplaceholder).into(((ReceiverViewHolder)holder).imageViewChat);
+            }
             if (messagesModel.getFeelings() >= 0) {
                 try {
                     ((ReceiverViewHolder) holder).Receiverfeelings.setImageResource(reactions[messagesModel.getFeelings()]);
@@ -171,7 +184,7 @@ public class ChatAdapter extends RecyclerView.Adapter{
 
     public class ReceiverViewHolder extends RecyclerView.ViewHolder{
         TextView receiverMsg,receiverTime;
-        ImageView Receiverfeelings;
+        ImageView Receiverfeelings,imageViewChat;
 
 
         public ReceiverViewHolder(@NonNull View itemView) {
@@ -179,18 +192,21 @@ public class ChatAdapter extends RecyclerView.Adapter{
             receiverMsg=itemView.findViewById(R.id.receiverTextChatDetails);
             receiverTime=itemView.findViewById(R.id.receiverTimeChatDetail);
             Receiverfeelings=itemView.findViewById(R.id.feelingsReceiverChatDetails);
+            imageViewChat=itemView.findViewById(R.id.receiverImage);
+
 
         }
     }
     public class SenderViewHolder extends RecyclerView.ViewHolder{
         TextView senderMsg,senderTime;
-        ImageView Senderfeelings;
+        ImageView Senderfeelings,imageViewChat;
 
         public SenderViewHolder(@NonNull View itemView) {
             super(itemView);
             senderMsg=itemView.findViewById(R.id.senderText);
             senderTime=itemView.findViewById(R.id.senderTime);
             Senderfeelings=itemView.findViewById(R.id.feelingsSenderChatDetails);
+            imageViewChat=itemView.findViewById(R.id.senderImage);
         }
     }
 }
