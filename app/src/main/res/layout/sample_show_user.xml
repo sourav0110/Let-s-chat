@@ -40,7 +40,7 @@
             android:paddingTop="2dp"
             android:paddingBottom="2dp"
             android:layout_marginStart="10dp"
-            android:text="last message" />
+            android:text=" Tap to chat " />
     </LinearLayout>
 
 

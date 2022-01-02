@@ -164,6 +164,7 @@ public class chatAppMainActivity extends AppCompatActivity implements AddContact
 
     }
 
+
     public void addContactDatabase(String email) {
 
         Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("mail").equalTo(email);
@@ -220,6 +221,21 @@ public class chatAppMainActivity extends AppCompatActivity implements AddContact
             }
         });
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        adapter.notifyDataSetChanged();
+        String currentId=FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseDatabase.getInstance().getReference().child("presence").child(currentId).setValue("online");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        String currentId=FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseDatabase.getInstance().getReference().child("presence").child(currentId).setValue("offline");
     }
 
 }

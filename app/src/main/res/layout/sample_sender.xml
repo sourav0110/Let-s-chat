@@ -2,9 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/senderMessage"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:id="@+id/senderMessage">
+    android:layout_height="wrap_content">
 
     <androidx.constraintlayout.widget.ConstraintLayout
 
@@ -16,8 +16,8 @@
         android:layout_marginRight="7dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/bg_sender"
-        android:maxWidth="310dp"
-        android:maxHeight="400dp"
+        android:maxWidth="320dp"
+        android:maxHeight="500dp"
         android:minHeight="30dp">
 
 
@@ -26,16 +26,17 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            app:layout_constraintGuide_end="16dp" />
+            app:layout_constraintGuide_end="12dp" />
 
         <ImageView
             android:id="@+id/senderImage"
-            android:layout_width="180dp"
-            android:layout_height="180dp"
+            android:layout_width="250dp"
+            android:layout_height="200dp"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
+            android:scaleType="centerCrop"
             android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@+id/senderTime"
             app:layout_constraintEnd_toStartOf="@id/guideline3"
@@ -48,27 +49,26 @@
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@+id/senderText"
+            android:layout_marginTop="5dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@id/senderText"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.01999998"
             app:srcCompat="@drawable/ic_fb_love" />
 
         <TextView
             android:id="@+id/senderText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="30dp"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="3dp"
-
             android:inputType="textLongMessage|textMultiLine"
             android:maxWidth="270dp"
             android:minWidth="50dp"
             android:text="TextView"
+            android:textColor="#000000"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -79,18 +79,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:layout_marginRight="4dp"
-            android:layout_marginBottom="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="8dp"
             android:text="12:00 PM"
-            android:textSize="10dp"
+            android:textColor="#000000"
+            android:textSize="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/guideline3"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toEndOf="@+id/senderText"
             app:layout_constraintTop_toBottomOf="@+id/senderText"
             app:layout_constraintVertical_bias="0.96" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </RelativeLayout>
