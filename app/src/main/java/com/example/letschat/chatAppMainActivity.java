@@ -97,12 +97,17 @@ public class chatAppMainActivity extends AppCompatActivity implements AddContact
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.Settings:
-                Toast.makeText(chatAppMainActivity.this, "Settings", Toast.LENGTH_LONG).show();
+                Intent intentt=new Intent(chatAppMainActivity.this,settingsActivity.class);
+                startActivity(intentt);
                 break;
             case R.id.Logout:
+                String currentId = FirebaseAuth.getInstance().getUid();
+                FirebaseDatabase.getInstance().getReference().child("presence").child(currentId).setValue("offline");
                 mAuth.signOut();
-                Intent intent = new Intent(chatAppMainActivity.this, MainActivity.class);
-                startActivity(intent);
+                Intent intent1 = new Intent(chatAppMainActivity.this, MainActivity.class);
+                startActivity(intent1);
+                finish();
+
                 break;
             case R.id.addContact:
                 openDialog();
@@ -232,10 +237,12 @@ public class chatAppMainActivity extends AppCompatActivity implements AddContact
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        String currentId=FirebaseAuth.getInstance().getCurrentUser().getUid();
-        FirebaseDatabase.getInstance().getReference().child("presence").child(currentId).setValue("offline");
+    protected void onDestroy() {
+        super.onDestroy();
+        if(mAuth.getCurrentUser()!=null) {
+            String currentId = FirebaseAuth.getInstance().getUid();
+            FirebaseDatabase.getInstance().getReference().child("presence").child(currentId).setValue("offline");
+        }
     }
 
 }

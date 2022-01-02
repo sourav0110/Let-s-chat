@@ -12,8 +12,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LetsChat">
         <activity
+            android:name=".settingsActivity"
+            android:exported="false" />
+        <activity
             android:name=".chatDetailActivity"
-            android:exported="false"></activity>
+            android:exported="false" />
         <activity
             android:name=".chatAppMainActivity"
             android:exported="false" />

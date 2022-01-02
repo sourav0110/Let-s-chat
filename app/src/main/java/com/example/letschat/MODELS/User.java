@@ -1,7 +1,15 @@
 package com.example.letschat.MODELS;
 
 public class User {
-    String profilepic,UserName,mail,password,userId,lastMessage;
+    String profilepic,UserName,mail,password,userId,lastMessage,userStatus;
+
+    public String getUserStatus() {
+        return userStatus;
+    }
+
+    public void setUserStatus(String userStatus) {
+        this.userStatus = userStatus;
+    }
 
     public User(String profilepic, String userName, String mail, String password, String userId, String lastMessage) {
         this.profilepic = profilepic;
