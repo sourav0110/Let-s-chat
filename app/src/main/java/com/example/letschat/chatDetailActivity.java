@@ -206,8 +206,8 @@ public class chatDetailActivity extends AppCompatActivity {
                         Intent data=result.getData();
                         Uri imageUri=data.getData();
                         if(imageUri !=null){
-                            Calendar calendar=Calendar.getInstance();
-                            StorageReference reference=storage.getReference().child("chats").child(calendar.getTimeInMillis()+"");
+                            String randomKey = FirebaseDatabase.getInstance().getReference().push().getKey();
+                            StorageReference reference=storage.getReference().child("chats").child(randomKey);
                             dialog.show();
                             reference.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                                 @Override
@@ -218,7 +218,6 @@ public class chatDetailActivity extends AppCompatActivity {
                                             public void onSuccess(Uri uri) {
                                                 dialog.dismiss();
                                               String filePath=uri.toString();
-                                              String randomKey = FirebaseDatabase.getInstance().getReference().push().getKey();
                                               final MessagesModel model = new MessagesModel(senderId, "");
                                               model.setTimestamp(new Date().getTime());
                                               model.setMessageType("pic");

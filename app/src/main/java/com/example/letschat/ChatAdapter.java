@@ -1,7 +1,9 @@
 package com.example.letschat;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +21,7 @@ import com.github.pgreze.reactions.ReactionsConfig;
 import com.github.pgreze.reactions.ReactionsConfigBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -115,6 +118,30 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
         });
 
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                new AlertDialog.Builder(context)
+                        .setTitle("Delete")
+                        .setMessage("Are you sure you want to delete the message? ")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                FirebaseDatabase.getInstance().getReference().child("Chats").child(senderRoom)
+                                        .child(messagesModel.getMessageId()).setValue(null);
+                                if(getItemViewType(position)==SENDER_VIEW_PICTYPE || getItemViewType(position)==RECEIVER_VIEW_PICTYPE){
+                                    FirebaseStorage.getInstance().getReference().child("chats").child(messagesModel.getMessageId()).delete();
+                                }
+                            }
+                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                }).show();
+                return false;
+            }
+        });
 
         if(holder.getClass()==SenderViewHolder.class){
             if(getItemViewType(position)==SENDER_VIEW_PICTYPE){
