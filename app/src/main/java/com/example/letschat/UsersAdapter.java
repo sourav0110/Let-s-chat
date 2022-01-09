@@ -60,7 +60,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.viewHolder>{
                         if(snapshot.hasChildren()){
                             for(DataSnapshot snapshot1 : snapshot.getChildren()){
                                 if(snapshot1.child("messageType").getValue(String.class).equals("text"))
-                                holder.lastMessage.setText(snapshot1.child("message").getValue(String.class));
+                                    holder.lastMessage.setText(snapshot1.child("message").getValue(String.class));
                                 else if(snapshot1.child("messageType").getValue(String.class).equals("pic"))
                                     holder.lastMessage.setText("photo");
                             }
@@ -96,7 +96,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.viewHolder>{
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 FirebaseDatabase.getInstance().getReference().child("userContacts").child(FirebaseAuth.getInstance().getUid())
-                                           .child(users.getUserId()).setValue(null).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        .child(users.getUserId()).setValue(null).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
                                         Toast.makeText(context, "The contact is deleted", Toast.LENGTH_LONG).show();

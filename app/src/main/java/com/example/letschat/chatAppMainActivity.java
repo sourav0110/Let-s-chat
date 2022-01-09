@@ -48,7 +48,7 @@ public class chatAppMainActivity extends AppCompatActivity implements AddContact
         binding.chatRecyclerView.setAdapter(adapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         binding.chatRecyclerView.setLayoutManager(layoutManager);
-       // Log.d("Sourav01", Objects.requireNonNull(mAuth.getCurrentUser()).getEmail());
+        // Log.d("Sourav01", Objects.requireNonNull(mAuth.getCurrentUser()).getEmail());
 
 
         try {
@@ -164,7 +164,7 @@ public class chatAppMainActivity extends AppCompatActivity implements AddContact
         if(email.equals(mAuth.getCurrentUser().getEmail())){
             Toast.makeText(chatAppMainActivity.this,"Not allowed to add own email",Toast.LENGTH_LONG).show();
         }else {
-           addContactDatabase(email);
+            addContactDatabase(email);
         }
 
     }
@@ -186,7 +186,7 @@ public class chatAppMainActivity extends AppCompatActivity implements AddContact
                     }
 
 
-                   //Toast.makeText(chatAppMainActivity.this, receiverContactUid, Toast.LENGTH_LONG).show();
+                    //Toast.makeText(chatAppMainActivity.this, receiverContactUid, Toast.LENGTH_LONG).show();
 
 
                     if(!userContacts.contains(email)) { //prevents duplication in own contact list
