@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -86,7 +87,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         MessagesModel messagesModel=messagesModels.get(position);
 
         ReactionsConfig config = new ReactionsConfigBuilder(context)
@@ -144,12 +145,22 @@ public class ChatAdapter extends RecyclerView.Adapter {
         });
 
         if(holder.getClass()==SenderViewHolder.class){
+
             if(getItemViewType(position)==SENDER_VIEW_PICTYPE){
                 ((SenderViewHolder)holder).imageViewChat.setVisibility(View.VISIBLE);
                 ((SenderViewHolder)holder).senderMsg.setVisibility(View.GONE);
                 Picasso.get().load(messagesModel.getImageUrl()).placeholder(R.drawable.imageplaceholder).into(((SenderViewHolder)holder).imageViewChat);
             }else{
                 ((SenderViewHolder)holder).imageViewChat.setVisibility(View.GONE);
+                CipherTextConverter cipher = new CipherTextConverter(receiverRoom);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    try {
+                        messagesModel.setMessage(cipher.decrypt(messagesModel.getMessage()));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
             }
             Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
             calendar.setTimeInMillis(messagesModel.getTimestamp());
@@ -192,6 +203,14 @@ public class ChatAdapter extends RecyclerView.Adapter {
                 Picasso.get().load(messagesModel.getImageUrl()).placeholder(R.drawable.imageplaceholder).into(((ReceiverViewHolder)holder).imageViewChat);
             }else{
                 ((ReceiverViewHolder)holder).imageViewChat.setVisibility(View.GONE);
+                CipherTextConverter cipher = new CipherTextConverter(senderRoom);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    try {
+                        messagesModel.setMessage(cipher.decrypt(messagesModel.getMessage()));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
             }
             Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
             calendar.setTimeInMillis(messagesModel.getTimestamp());

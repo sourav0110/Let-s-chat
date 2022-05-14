@@ -5,6 +5,7 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -13,10 +14,12 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -106,11 +109,13 @@ public class chatDetailActivity extends AppCompatActivity {
         db1.getReference().child("Chats").child(senderRoom).addValueEventListener(new ValueEventListener() {
 
 
+
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 messagesModels.clear();
                 for(DataSnapshot snapshot1 : snapshot.getChildren()){
                     MessagesModel model=snapshot1.getValue(MessagesModel.class);
+
                     model.setMessageId(snapshot1.getKey());
                     messagesModels.add(model);
 
@@ -161,9 +166,20 @@ public class chatDetailActivity extends AppCompatActivity {
         });
         try {
             binding.sendButtonChatDetails.setOnClickListener(new View.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.O)
                 @Override
                 public void onClick(View view) {
                     String message = binding.editTextChatDetail.getText().toString();
+                    String m=message;
+                    // Encrption technique;
+                    CipherTextConverter cipher =new CipherTextConverter(receiverRoom);
+                    try {
+                        message=cipher.encrypt(message);
+                        Log.d("Sourav01",message);
+                    } catch (Exception e) {
+                        message=m;
+                        Log.d("Sourav01","Exception");
+                    }
                     // newly added for emogi
                     String randomKey = database.getReference().push().getKey();
                     if (!message.equals("")) {

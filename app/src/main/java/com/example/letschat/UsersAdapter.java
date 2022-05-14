@@ -5,6 +5,8 @@ import android.content.Context;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.letschat.MODELS.User;
@@ -23,6 +26,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -38,7 +42,6 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.viewHolder>{
         this.context = context;
     }
 
-
     @NonNull
     @Override
     public viewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -50,19 +53,37 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.viewHolder>{
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
         User users=list.get(position);
-        Picasso.get().load(users.getProfilepic()).placeholder(R.drawable.ugr).into(holder.image);
+        Picasso.get().load(users.getProfilepic()).networkPolicy(NetworkPolicy.OFFLINE).placeholder(R.drawable.ugr).into(holder.image);
         holder.username.setText(users.getUserName());
         FirebaseDatabase.getInstance().getReference().child("Chats").child(Objects.requireNonNull(FirebaseAuth.getInstance().getUid())+ users.getUserId())
                 .orderByChild("timestamp").limitToLast(1)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.O)
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if(snapshot.hasChildren()){
                             for(DataSnapshot snapshot1 : snapshot.getChildren()){
-                                if(snapshot1.child("messageType").getValue(String.class).equals("text"))
-                                    holder.lastMessage.setText(snapshot1.child("message").getValue(String.class));
-                                else if(snapshot1.child("messageType").getValue(String.class).equals("pic"))
-                                    holder.lastMessage.setText("photo");
+                                String uid = snapshot1.child("uId").getValue(String.class);
+
+                                String key="",lm="";
+                                if(uid.equals(FirebaseAuth.getInstance().getUid()))
+                                    key=users.getUserId()+FirebaseAuth.getInstance().getUid();
+                                else
+                                    key=FirebaseAuth.getInstance().getUid()+users.getUserId();
+
+                             if(snapshot1.child("messageType").getValue(String.class).equals("text"))
+                             {
+                                 lm = snapshot1.child("message").getValue(String.class);
+                                 CipherTextConverter cipher = new CipherTextConverter(key);
+                                 try {
+                                     lm = cipher.decrypt(lm);
+                                 } catch (Exception e) {
+                                     e.printStackTrace();
+                                 }
+                                 holder.lastMessage.setText(lm);
+                             }
+                             else if(snapshot1.child("messageType").getValue(String.class).equals("pic"))
+                                 holder.lastMessage.setText("photo");
                             }
                         }else {
                             holder.lastMessage.setText("Tap to chat");
